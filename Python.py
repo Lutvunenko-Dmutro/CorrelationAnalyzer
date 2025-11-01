@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, scrolledtext
-# Замінюємо стандартний ttk на ttkbootstrap
 import ttkbootstrap as ttk 
 import pandas as pd
 import seaborn as sns
@@ -17,12 +16,12 @@ class CorrelationApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Інструмент для кореляційного аналізу (v3.0 з Інтерпретацією)")
-        self.root.geometry("900x700") # Збільшимо вікно
+        self.root.geometry("900x700") 
 
         self.df_cleaned = None
         self.corr_matrix = None
-        self.tree_grouping = None # Зберігаємо посилання на таблиці
-        self.tree_list = None     #
+        self.tree_grouping = None 
+        self.tree_list = None     
         
         self.STRONG_CORR_THRESHOLD = 0.8
         plt.style.use('dark_background')
@@ -34,13 +33,11 @@ class CorrelationApp:
         self.tab_heatmap = ttk.Frame(self.notebook)
         self.tab_grouping = ttk.Frame(self.notebook)
         self.tab_list = ttk.Frame(self.notebook)
-        # НОВА ВКЛАДКА
         self.tab_interpret = ttk.Frame(self.notebook) 
 
         self.notebook.add(self.tab_heatmap, text='Теплова карта (Heatmap)')
         self.notebook.add(self.tab_grouping, text='Групування (r > 0.8)')
         self.notebook.add(self.tab_list, text='Список коефіцієнтів')
-        # НОВА ВКЛАДКА
         self.notebook.add(self.tab_interpret, text='Інтерпретація 💡')
         
         self.notebook.pack(expand=True, fill='both', padx=10, pady=10)
@@ -51,7 +48,6 @@ class CorrelationApp:
         self.show_welcome_message(self.tab_list)
 
     def create_menu(self):
-        # ... (Код без змін) ...
         """Створює головне меню програми."""
         menubar = tk.Menu(self.root)
         self.root.config(menu=menubar)
@@ -64,7 +60,6 @@ class CorrelationApp:
         menubar.add_cascade(label="Файл", menu=file_menu)
 
     def show_welcome_message(self, tab, message=None):
-        # ... (Код злегка змінено, щоб приймати кастомні повідомлення) ...
         """Показує вітальне повідомлення до завантаження даних."""
         for widget in tab.winfo_children():
             widget.destroy()
@@ -101,8 +96,8 @@ class CorrelationApp:
             wrap=tk.WORD,
             font=("Arial", 12),
             height=10,
-            bg="#303030", # Колір фону
-            fg="white",     # Колір тексту
+            bg="#303030", 
+            fg="white",   
             padx=15,
             pady=15,
             relief=tk.FLAT
@@ -112,7 +107,6 @@ class CorrelationApp:
         self.interpret_text_area.config(state=tk.DISABLED)
 
     def load_csv(self):
-        # ... (Код без змін) ...
         """
         Відкриває діалог вибору файлу та запускає процес
         завантаження, обробки та аналізу.
@@ -133,7 +127,6 @@ class CorrelationApp:
             messagebox.showerror("Помилка завантаження", f"Не вдалося прочитати файл:\n{e}")
 
     def process_data(self, df_raw):
-        # ... (Код без змін) ...
         """
         Обробляє завантажений DataFrame:
         1. Очищує дані (лише числові, без NaN).
@@ -160,7 +153,6 @@ class CorrelationApp:
         self.update_heatmap_tab()
         self.update_list_tab()
         self.update_grouping_tab()
-        # Очищуємо вкладку інтерпретації
         self.setup_interpretation_tab() 
         
         dropped_rows = original_rows - cleaned_rows
@@ -180,7 +172,6 @@ class CorrelationApp:
             widget.destroy()
 
     def update_heatmap_tab(self):
-        # ... (Код без змін) ...
         """Оновлює вкладку "Теплова карта"."""
         self.clear_tab(self.tab_heatmap)
         
@@ -236,7 +227,6 @@ class CorrelationApp:
         hsb.pack(side='bottom', fill='x')
         self.tree_list.pack(expand=True, fill='both')
         
-        # НОВИЙ КОД: Прив'язка події кліку
         self.tree_list.bind("<<TreeviewSelect>>", self.on_list_select)
 
     def update_grouping_tab(self):
@@ -274,10 +264,8 @@ class CorrelationApp:
         vsb.pack(side='right', fill='y')
         self.tree_grouping.configure(yscrollcommand=vsb.set)
         
-        # НОВИЙ КОД: Прив'язка події кліку
         self.tree_grouping.bind("<<TreeviewSelect>>", self.on_grouping_select)
 
-    # --- НОВІ ФУНКЦІЇ ДЛЯ ІНТЕРПРЕТАЦІЇ ---
 
     def on_grouping_select(self, event):
         """Обробляє клік на таблиці 'Групування'."""
@@ -301,15 +289,13 @@ class CorrelationApp:
             if not selected_item:
                 return
             
-            # Це складніше, нам треба визначити, на яку колонку клікнули
             item = self.tree_list.item(selected_item)
-            var1 = item['values'][0] # Назва рядка
+            var1 = item['values'][0] 
             
-            # Визначаємо колонку, на яку клікнули
             column_id = self.tree_list.identify_column(event.x)
-            column_index = int(column_id.replace('#', '')) - 1 # -1, бо перша колонка 'Змінна'
+            column_index = int(column_id.replace('#', '')) - 1 
             
-            if column_index == 0: # Якщо клікнули на саму назву змінної
+            if column_index == 0: 
                 self.display_interpretation(var1, var1, 1.0)
                 return
                 
@@ -331,7 +317,6 @@ class CorrelationApp:
         self.interpret_text_area.insert(tk.END, interpretation_text)
         self.interpret_text_area.config(state=tk.DISABLED)
         
-        # Автоматично перемикаємо на вкладку
         self.notebook.select(self.tab_interpret)
 
     def interpret_correlation(self, var1, var2, corr_val):
@@ -376,7 +361,7 @@ class CorrelationApp:
             direction = "лінійний"
             explanation = f"Між `{var1}` та `{var2}` не спостерігається значущого лінійного зв'язку."
         
-        # Формування фінального тексту
+        # Формування тексту
         final_text = (
             f"**Інтерпретація зв'язку:**\n\n"
             f"**Змінні:** `{var1}` та `{var2}`\n"
@@ -397,4 +382,5 @@ if __name__ == "__main__":
     main_window = ttk.Window(themename="darkly")
     app = CorrelationApp(main_window)
     main_window.mainloop()
+
 
